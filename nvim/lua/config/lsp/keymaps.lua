@@ -40,7 +40,7 @@ local function keymapping(client, bufnr)
 end
 
 function M.setup(client, bufnr)
-  keymappings(client, bufnr)
+  keymapping(client, bufnr)
 end
 
 return M
