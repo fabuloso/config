@@ -22,5 +22,4 @@ function M.setup(servers, options)
     end
   end
 end
-
 return M

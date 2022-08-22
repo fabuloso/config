@@ -36,6 +36,8 @@ function M.setup()
   local function plugins(use)
     use { "wbthomason/packer.nvim" }
 
+		use { "nvim-lua/plenary.nvim", module ="plenary" }
+
     -- Colorscheme
     use {
       "sainnhe/everforest",
@@ -43,14 +45,14 @@ function M.setup()
         vim.cmd "colorscheme everforest"
       end,
     }
-    
+
 		use {
 			"folke/which-key.nvim",
 			config = function()
 				require("config.whichkey").setup()
 			end,
 		}
-    
+
 		use {
       "kyazdani42/nvim-web-devicons",
       module = "nvim-web-devicons",
@@ -58,6 +60,16 @@ function M.setup()
         require("nvim-web-devicons").setup { default = true }
       end,
     }
+		
+		use {
+			"numToStr/Comment.nvim",
+			opt = true,
+			keys = { "gc", "gcc", "gbc"},
+			config = function()
+				require("Comment").setup {}
+			end,
+		}
+
 
 		use {
       "nvim-lualine/lualine.nvim",
@@ -68,15 +80,47 @@ function M.setup()
       requires = { "nvim-web-devicons" },
     }
 
+    -- User interface
+    use {
+      "stevearc/dressing.nvim",
+      event = "BufEnter",
+      config = function()
+        require("dressing").setup {
+          select = {
+            backend = { "telescope", "fzf", "builtin" },
+          },
+        }
+      end,
+      disable = true,
+    }
+    use { "nvim-telescope/telescope.nvim", module = "telescope", as = "telescope" }
+
 		-- Fuzzy Finder
-		use { "junegunn/fzf", run = "./install --all" }
-		use { "junegunn/fzf.vim" }
+		use { "junegunn/fzf", run = "./install --all", event = "VimEnter" }
+		use { "junegunn/fzf.vim", event = "BufEnter"}
 
 		use { "ibhagwan/fzf-lua",
+			event = "BufEnter",
 			requires = {"kyazdani42/nvim-web-devicons"}
 		}
-
-    -- Better Netrw
+  use {
+      "windwp/nvim-autopairs",
+      wants = "nvim-treesitter",
+      module = { "nvim-autopairs.completion.cmp", "nvim-autopairs" },
+      config = function()
+        require("config.autopairs").setup()
+      end,
+    }
+		-- Auto tag
+    use {
+      "windwp/nvim-ts-autotag",
+      wants = "nvim-treesitter",
+      event = "InsertEnter",
+      config = function()
+        require("nvim-ts-autotag").setup { enable = true }
+      end,
+    }
+   -- Better Netrw
     use { "tpope/vim-vinegar" }
 
 		use {
@@ -94,13 +138,48 @@ function M.setup()
 			"neovim/nvim-lspconfig",
 			opt = true,
 			event = "BufReadPre",
-			wants = { "nvim-lsp-installer"},
+			-- wants = { "cmp-nvim-lsp", "nvim-lsp-installer", "lsp_signature.nvim"},
+			wants = { "coq_nvim", "nvim-lsp-installer", "lsp_signature.nvim"},
 			config = function()
 				require("config.lsp").setup()
 			end,
 			requires = {
 				"williamboman/nvim-lsp-installer",
+				"ray-x/lsp_signature.nvim",
 			},
+		}
+
+		use {
+			"hrsh7th/nvim-cmp",
+			event = "InsertEnter",
+			opt = true,
+			config = function()
+				require("config.cmp").setup()
+			end,
+			wants = {"LuaSnip"},
+			requires = {
+				"hrsh7th/cmp-buffer",
+				"hrsh7th/cmp-path",
+				"hrsh7th/cmp-nvim-lua",
+				"ray-x/cmp-treesitter",
+				"hrsh7th/cmp-cmdline",
+				"saadparwaiz1/cmp_luasnip",
+				"hrsh7th/cmp-nvim-lsp",
+				{
+					"L3MON4D3/LuaSnip",
+					wants = "friendly-snippets",
+					config = function()
+						require("config.luasnip").setup()
+					end,
+				},
+				"rafamadriz/friendly-snippets",
+			},
+			disable = true,
+		}
+
+		use {
+			"ms-jpq/coq_nvim",
+			disable = false,
 		}
 
     use {
